@@ -2,7 +2,7 @@
 /**
  * This file is part of the Billbee API package.
  *
- * Copyright 2017 by Billbee GmbH
+ * Copyright 2017 - 2018 by Billbee GmbH
  *
  * For the full copyright and license information, please read the LICENSE
  * file that was distributed with this source code.
@@ -50,6 +50,12 @@ class Stock implements \JsonSerializable
      */
     protected $deltaQuantity = 0;
 
+    /**
+     * If true, the reserved amount will be reduced on update
+     * @var bool
+     */
+    protected $autosubtractReservedAmount = false;
+
     public static function fromProduct(Product $product)
     {
         return new Stock($product->sku, $product->stockCurrent);
@@ -59,7 +65,7 @@ class Stock implements \JsonSerializable
     {
         $this->sku = $sku;
         $this->oldQuantity = $oldQuantity;
-        if ($newQuantity == null) {
+        if ($newQuantity === null) {
             $newQuantity = $oldQuantity;
         }
         $this->setNewQuantity($newQuantity);
@@ -176,6 +182,24 @@ class Stock implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function getAutosubtractReservedAmount()
+    {
+        return $this->autosubtractReservedAmount;
+    }
+
+    /**
+     * @param bool $autosubtractReservedAmount
+     * @return Stock
+     */
+    public function setAutosubtractReservedAmount($autosubtractReservedAmount)
+    {
+        $this->autosubtractReservedAmount = $autosubtractReservedAmount;
+        return $this;
+    }
+
     public function jsonSerialize()
     {
         $data = [
@@ -184,6 +208,7 @@ class Stock implements \JsonSerializable
             'OldQuantity' => $this->oldQuantity,
             'NewQuantity' => $this->newQuantity,
             'DeltaQuantity' => $this->deltaQuantity,
+            'AutosubtractReservedAmount' => $this->autosubtractReservedAmount,
         ];
 
         if (!is_null($this->stockId)) {
